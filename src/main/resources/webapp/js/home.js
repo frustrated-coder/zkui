@@ -32,7 +32,6 @@ $(document).ready(function() {
         $("#newProperty").attr('readonly', true);
         $("#newProperty").val(propName);
         $("#newValue").val(propVal);
-        // $("#newBooleanKey").val(isJsonL);
 
         $("#savePropertyBtn").hide();
         $("#updatePropertyBtn").show();
