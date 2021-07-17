@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooKeeper;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,7 +109,7 @@ public class Home extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        logger.debug("Home Post Action!");
+        logger.info("Home Post Action!");
         try {
             Properties globalProps = (Properties) this.getServletContext().getAttribute("globalProps");
             Dao dao = new Dao(globalProps);
@@ -142,6 +143,12 @@ public class Home extends HttpServlet {
                 case "Save Property":
                     if (!newProperty.equals("") && !currentPath.equals("") && authRole.equals(ZooKeeperUtil.ROLE_ADMIN)) {
                         //Save the new node.
+                        logger.info("save data key " + newProperty);
+                        logger.info("save data  value " + newValue);
+                        if(newValue.startsWith("{") && newValue.endsWith("}")) {
+                            JSONObject data = new JSONObject(newValue);
+                            logger.info("save : converted json is "+ data);
+                        }
                         ZooKeeperUtil.INSTANCE.createNode(currentPath, newProperty, newValue, ServletUtil.INSTANCE.getZookeeper(request, response, zkServerLst[0], globalProps));
                         request.getSession().setAttribute("flashMsg", "Property Saved!");
                         if (ZooKeeperUtil.INSTANCE.checkIfPwdField(newProperty)) {
@@ -154,6 +161,13 @@ public class Home extends HttpServlet {
                 case "Update Property":
                     if (!newProperty.equals("") && !currentPath.equals("") && authRole.equals(ZooKeeperUtil.ROLE_ADMIN)) {
                         //Save the new node.
+                        logger.info("update data  KEY" + newProperty);
+                        logger.info("update data  value " + newValue);
+
+                        if(newValue.startsWith("{") && newValue.endsWith("}")) {
+                            JSONObject data = new JSONObject(newValue);
+                            logger.info("update: converted json is "+ data);
+                        }
                         ZooKeeperUtil.INSTANCE.setPropertyValue(currentPath, newProperty, newValue, ServletUtil.INSTANCE.getZookeeper(request, response, zkServerLst[0], globalProps));
                         request.getSession().setAttribute("flashMsg", "Property Updated!");
                         if (ZooKeeperUtil.INSTANCE.checkIfPwdField(newProperty)) {
